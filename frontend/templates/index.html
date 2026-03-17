@@ -1,0 +1,392 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TENDERLINK - Next Gen Procurement</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/style_v3.css' %}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container nav-container">
+                <div class="logo-section">
+                    <div class="state-emblem">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>TENDERLINK</h1>
+                        <p>Procurement System</p>
+                    </div>
+                </div>
+
+                <div class="nav-links">
+                    <a href="{% url 'index' %}" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+                    <a href="{% url 'listing' %}" class="nav-link"><i class="fas fa-briefcase"></i> Active Tenders</a>
+                    <a href="{% url 'archive' %}" class="nav-link"><i class="fas fa-archive"></i> Archive</a>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="auth-section">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-login"
+                            style="margin-right: 5px; background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color);">Dashboard</a>
+                        <a href="{% url 'logout' %}" class="btn btn-login"
+                            style="background: #ef4444; border: none; color: white;"><i
+                                class="fas fa-sign-out-alt"></i></a>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        {% endif %}
+                    </div>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+
+                <div class="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+
+
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h2>Transparent Tender Management for <span style="color: var(--primary-color)">Future Growth</span>
+                </h2>
+                <p>The official next-generation portal for secure, transparent, and efficient procurement opportunities
+                    across India.</p>
+
+                <div class="hero-actions">
+                    <a href="{% url 'listing' %}" class="btn btn-primary" style="text-decoration: none;"><i
+                            class="fas fa-search"></i> Search Tenders</a>
+                </div>
+
+                <style>
+                    .stat-num {
+                        font-size: 2rem;
+                        font-weight: 700;
+                        color: var(--dark-text);
+                    }
+
+                    .category-card.empty-cat {
+                        opacity: 0.6;
+                        filter: grayscale(0.5);
+                        cursor: not-allowed;
+                    }
+
+                    .cs-badge {
+                        font-size: 0.65rem;
+                        background: var(--border-color);
+                        color: var(--medium-text);
+                        padding: 2px 8px;
+                        border-radius: 10px;
+                        font-weight: 600;
+                        margin-top: 8px;
+                        display: inline-block;
+                    }
+                </style>
+                <div class="hero-stats" style="display: flex; gap: 40px; margin-top: 40px;">
+                    <!-- prettier-ignore -->
+                    <div class="stat" style="animation: fadeIn 0.5s ease-out 0.6s backwards;">
+                        <h3 class="stat-num">{{ active_tenders_count }}</h3>
+                        <p style="color: var(--medium-text);">Active Tenders</p>
+                    </div>
+                    <!-- prettier-ignore -->
+                    <div class="stat" style="animation: fadeIn 0.5s ease-out 0.8s backwards;">
+                        <h3 class="stat-num">{{ formatted_total_value }}</h3>
+                        <p style="color: var(--medium-text);">Total Value</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image"
+                style="position: relative; display: flex; justify-content: center; align-items: center;">
+                <div class="hero-visual-container">
+                    <div class="network-grid"></div>
+
+                    <div class="tech-hub">
+                        <!-- New: Data Stream Bars instead of Rings -->
+                        <div class="data-stream horizontal bar-1"></div>
+                        <div class="data-stream horizontal bar-2"></div>
+                        <div class="data-stream vertical bar-3"></div>
+                        <div class="data-stream vertical bar-4"></div>
+
+
+
+                        <div class="hub-logo">
+                            <i class="fas fa-fingerprint"></i>
+                        </div>
+
+                        <div class="radar-beam"></div>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section" id="search">
+        <div class="container">
+            <div class="search-box">
+                <h3><i class="fas fa-search-dollar"></i> Find Opportunities</h3>
+                <form class="search-form" action="{% url 'listing' %}" method="GET">
+                    <div class="search-input">
+                        <i class="fas fa-search" style="padding: 12px; color: var(--light-text);"></i>
+                        <input type="text" name="q" placeholder="Search by tender title, ID, or keywords...">
+                        <button type="submit" class="btn-search"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tender Categories -->
+    <section class="categories" id="categories">
+        <div class="container">
+            <h2 class="section-title">Explore Categories</h2>
+            <div class="category-grid">
+                <div class="category-card {% if category_counts.construction == 0 %}empty-cat{% endif %}">
+                    <div class="category-icon"><i class="fas fa-hard-hat"></i></div>
+                    <h3>Construction</h3>
+                    <p>Roads, Bridges, Infra</p>
+                    <span class="count">{{ category_counts.construction }} Open</span>
+                    {% if category_counts.construction == 0 %}<span class="cs-badge">Coming Soon</span>{% endif %}
+                </div>
+                <div class="category-card {% if category_counts.electrical == 0 %}empty-cat{% endif %}">
+                    <div class="category-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Electrical</h3>
+                    <p>Wiring, Power, Lighting</p>
+                    <span class="count">{{ category_counts.electrical }} Open</span>
+                    {% if category_counts.electrical == 0 %}<span class="cs-badge">Coming Soon</span>{% endif %}
+                </div>
+                <div class="category-card {% if category_counts.transport == 0 %}empty-cat{% endif %}">
+                    <div class="category-icon"><i class="fas fa-truck"></i></div>
+                    <h3>Transport</h3>
+                    <p>Vehicles, Logistics, Shipping</p>
+                    <span class="count">{{ category_counts.transport }} Open</span>
+                    {% if category_counts.transport == 0 %}<span class="cs-badge">Coming Soon</span>{% endif %}
+                </div>
+                <div class="category-card {% if category_counts.consultancy == 0 %}empty-cat{% endif %}">
+                    <div class="category-icon"><i class="fas fa-user-tie"></i></div>
+                    <h3>Consultancy</h3>
+                    <p>Audit, Legal, Strategy</p>
+                    <span class="count">{{ category_counts.consultancy }} Open</span>
+                    {% if category_counts.consultancy == 0 %}<span class="cs-badge">Coming Soon</span>{% endif %}
+                </div>
+                <div class="category-card {% if category_counts.medical == 0 %}empty-cat{% endif %}">
+                    <div class="category-icon"><i class="fas fa-stethoscope"></i></div>
+                    <h3>Medical Supply</h3>
+                    <p>Pharma, Equipment, Labs</p>
+                    <span class="count">{{ category_counts.medical }} Open</span>
+                    {% if category_counts.medical == 0 %}<span class="cs-badge">Coming Soon</span>{% endif %}
+                </div>
+                <div class="category-card {% if category_counts.other == 0 %}empty-cat{% endif %}">
+                    <div class="category-icon"><i class="fas fa-box-open"></i></div>
+                    <h3>Other</h3>
+                    <p>General, Assorted, Misc</p>
+                    <span class="count">{{ category_counts.other }} Open</span>
+                    {% if category_counts.other == 0 %}<span class="cs-badge">Coming Soon</span>{% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Tenders -->
+    <section class="latest-tenders" id="tenders">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" style="text-align: left; left: 0; transform: none; margin-bottom: 8px;">
+                        Active Tenders</h2>
+                    <p style="color: var(--medium-text);">Recently published opportunities closing soon</p>
+                </div>
+                <a href="{% url 'listing' %}" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tender-table">
+                <div class="table-header">
+                    <div class="col">Tender ID</div>
+                    <div class="col">Title</div>
+                    <div class="col">Category</div>
+                    <div class="col">Location</div>
+                    <div class="col">Deadline</div>
+                    <div class="col">Action</div>
+                </div>
+
+                {% if tenders %}
+                {% for tender in tenders %}
+                <div class="table-row">
+                    <div class="col">
+                        <span class="tender-id">TL-{{ tender.id|stringformat:"04d" }}</span>
+                    </div>
+                    <div class="col">
+                        <h4>{{ tender.title }}</h4>
+                        <p class="tender-desc">Budget: {{ tender.budget|currency_in }}</p>
+                    </div>
+                    <div class="col">
+                        <span class="dept-badge">{{ tender.get_category_display }}</span>
+                    </div>
+                    <div class="col">
+                        <i class="fas fa-map-marker-alt"></i> {{ tender.location }}
+                    </div>
+                    <div class="col">
+                        <span class="date-warning">{{ tender.deadline|date:"d M Y" }}</span>
+                    </div>
+                    <div class="col" style="display: flex; align-items: center; gap: 10px;">
+                        <a href="{% url 'tender_detail' tender.id %}" class="btn-view"
+                            style="text-decoration: none; display: inline-block; text-align: center;">Details</a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'toggle_favorite' tender.id %}" class="favorite-toggle"
+                            data-id="{{ tender.id }}"
+                            style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.2s;">
+                            <i class="{% if tender.id in favorited_ids %}fas{% else %}far{% endif %} fa-star"
+                                style="color: #f59e0b; font-size: 1.1rem;"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="padding: 40px; text-align: center; color: var(--medium-text);">
+                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <p>No active tenders found currently.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Announcements -->
+    <section class="announcements" id="updates">
+        <div class="container">
+            <h2 class="section-title" style="margin-bottom: 50px;">Updates & Resources</h2>
+            <div class="announcement-grid">
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <i class="fas fa-bullhorn"></i>
+                        <h3>Critical Notice</h3>
+                    </div>
+                    <p>EMD submission deadline extended for all December infrastructure tenders. Please review the
+                        corrigendum.</p>
+                    <a href="#" class="announcement-link">Read Notice <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>Tender Calendar</h3>
+                    </div>
+                    <p>Check the schedule for upcoming pre-bid meetings, site visits, and submission closings.</p>
+                    <a href="#" class="announcement-link">View Calendar <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        <h3>Quick Downloads</h3>
+                    </div>
+                    <div class="download-links">
+                        <a href="{% url 'bid_format' %}"><i class="fas fa-file-pdf" style="color: #e11d48;"></i> Bid
+                            Format</a>
+                        <a href="{% url 'regulations' %}"><i class="fas fa-file-pdf" style="color: #e11d48;"></i>
+                            Regulations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <i class="fas fa-layer-group"></i>
+                        <div>
+                            <h3>TENDERLINK</h3>
+                            <p style="font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">Procurement
+                                System</p>
+                        </div>
+                    </div>
+                    <p class="footer-about">Official e-Tendering portal for transparent, efficient, and secure
+                        government and private procurement processes.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{% url 'listing' %}"><i class="fas fa-angle-right"></i> Active Tenders</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Corrigendum</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Results</a></li>
+                        <li><a href="{% url 'register' %}"><i class="fas fa-angle-right"></i> Register</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Departments</h4>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Public Works</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Irrigation</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Urban Dev</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Health</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Tech Park, Latur, Maharastra - 413512</p>
+                        <p><i class="fas fa-phone-alt"></i> 9322659313</p>
+                        <p><i class="fas fa-envelope"></i> helpdesk@tenderlink.in</p>
+                    </div>
+                    <div class="security-badge" style="margin-top: 20px; display: inline-flex;">
+                        <i class="fas fa-lock"></i> SSL Secured
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 TenderLink. All Rights Reserved.</p>
+                <div class="footer-links">
+                    <a href="{% url 'privacy' %}">Privacy</a>
+                    <a href="{% url 'terms' %}">Terms</a>
+                    <a href="#">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script for mobile menu -->
+    <!-- JS -->
+    <script src="{% static 'js/script_v3.js' %}"></script>
+</body>
+
+</html>

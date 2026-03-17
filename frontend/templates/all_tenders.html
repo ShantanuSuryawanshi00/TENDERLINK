@@ -1,0 +1,197 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Tenders - TENDERLINK</title>
+    <link rel="stylesheet" href="{% static 'css/style_v3.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container nav-container">
+                <div class="logo-section">
+                    <div class="state-emblem">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>TENDERLINK</h1>
+                        <p>Procurement System</p>
+                    </div>
+                </div>
+
+                <div class="nav-links">
+                    <a href="{% url 'index' %}" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                    <a href="{% url 'listing' %}" class="nav-link active"><i class="fas fa-briefcase"></i> Active
+                        Tenders</a>
+                    <a href="{% url 'archive' %}" class="nav-link"><i class="fas fa-archive"></i> Archive</a>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="auth-section">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-login"
+                            style="margin-right: 5px; background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color);">Dashboard</a>
+                        <a href="{% url 'logout' %}" class="btn btn-login"
+                            style="background: #ef4444; border: none; color: white;"><i
+                                class="fas fa-sign-out-alt"></i></a>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        {% endif %}
+                    </div>
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+
+                <div class="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-header"
+        style="padding-top: 120px; padding-bottom: 40px; background: var(--hover-bg); border-bottom: 1px solid var(--border-color);">
+        <div class="container">
+            <h2 id="page-title" style="font-size: 2rem; margin-bottom: 10px;">Active Tenders</h2>
+            <p id="page-subtitle" style="color: var(--medium-text);">Browse and bid on government opportunities</p>
+        </div>
+    </section>
+
+    <!-- Filters & List -->
+    <section class="listing-section" style="padding: 40px 0 80px;">
+        <div class="container">
+
+            <!-- Filters (Simplified for prototype) -->
+            <!-- Filter Bar (as Form) -->
+            <form class="filter-bar" method="GET"
+                style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 30px; display: flex; gap: 16px; flex-wrap: wrap; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                <div class="search-input" style="flex: 1; min-width: 250px; position: relative;">
+                    <i class="fas fa-search"
+                        style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                    <input type="text" id="list-search" name="q" value="{{ query }}"
+                        placeholder="Search by ID, keyword..."
+                        style="width: 100%; padding: 12px 12px 12px 45px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; background: var(--input-bg); color: var(--dark-text);">
+                </div>
+
+                <input type="number" name="min_budget" value="{{ min_budget|default:'' }}" placeholder="Min Budget"
+                    style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; width: 120px; background: var(--input-bg); color: var(--dark-text);">
+                <input type="number" name="max_budget" value="{{ max_budget|default:'' }}" placeholder="Max Budget"
+                    style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; width: 120px; background: var(--input-bg); color: var(--dark-text);">
+
+                <select name="category"
+                    style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; min-width: 150px; background: var(--input-bg); color: var(--dark-text);">
+                    <option value="">All Categories</option>
+                    <option value="construction" {% if selected_category|eq:'construction' %}selected{% endif %}>
+                        Construction
+                    </option>
+                    <option value="electrical" {% if selected_category|eq:'electrical' %}selected{% endif %}>Electrical
+                    </option>
+                    <option value="consultancy" {% if selected_category|eq:'consultancy' %}selected{% endif %}>
+                        Consultancy
+                    </option>
+                    <option value="transport" {% if selected_category|eq:'transport' %}selected{% endif %}>Transport
+                    </option>
+                    <option value="medical" {% if selected_category|eq:'medical' %}selected{% endif %}>Medical</option>
+                    <option value="other" {% if selected_category|eq:'other' %}selected{% endif %}>Other</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Apply Filters </button>
+            </form>
+
+            <div class="tender-table">
+                <div class="table-header">
+                    <div class="col">Tender ID</div>
+                    <div class="col">Title</div>
+                    <div class="col">Category</div>
+                    <div class="col">Location</div>
+                    <div class="col">Deadline</div>
+                    <div class="col">Action</div>
+                </div>
+
+                {% if tenders %}
+                {% for tender in tenders %}
+                <div class="table-row">
+                    <div class="col"><span class="tender-id">TL-{{ tender.id|stringformat:"04d" }}</span></div>
+                    <div class="col">
+                        <h4>{{ tender.title }}</h4>
+                        <p class="tender-desc">Budget: {{ tender.budget|currency_in }}</p>
+                    </div>
+                    <div class="col"><span class="dept-badge">{{ tender.get_category_display }}</span></div>
+                    <div class="col"><i class="fas fa-map-marker-alt"></i> {{ tender.location }}</div>
+                    <div class="col"><span class="date-warning">{{ tender.deadline|date:"d M Y" }}</span></div>
+                    <div class="col" style="display: flex; align-items: center; gap: 10px;">
+                        <a href="{% url 'tender_detail' tender.id %}" class="btn-view"
+                            style="text-decoration: none; display: inline-block; text-align: center;">Detail</a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'toggle_favorite' tender.id %}" class="favorite-toggle"
+                            data-id="{{ tender.id }}"
+                            style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.2s;">
+                            <i class="{% if tender.id in favorited_ids %}fas{% else %}far{% endif %} fa-star"
+                                style="color: #f59e0b; font-size: 1.1rem;"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="padding: 40px; text-align: center;">
+                    <p>No tenders found matching your search.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination -->
+            {% if tenders.has_other_pages %}
+            <div style="margin-top: 30px; display: flex; justify-content: center; gap: 8px;">
+                {% if tenders.has_previous %}
+                <a href="?page={{ tenders.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                    style="padding: 8px 16px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--dark-text); border-radius: 8px; text-decoration: none;">Prev</a>
+                {% endif %}
+
+                {% for num in tenders.paginator.page_range %}
+                {% if tenders.number == num %}
+                <span
+                    style="padding: 8px 16px; border: 1px solid var(--primary-color); background: var(--primary-color); color: white; border-radius: 8px;">{{ num }}</span>
+                {% else %}
+                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                    style="padding: 8px 16px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--dark-text); border-radius: 8px; text-decoration: none;">{{ num }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if tenders.has_next %}
+                <a href="?page={{ tenders.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                    style="padding: 8px 16px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--dark-text); border-radius: 8px; text-decoration: none;">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; <span id="year">2026</span> TenderLink. All Rights Reserved.</p>
+                <div class="footer-links">
+                    <a href="{% url 'privacy' %}">Privacy</a>
+                    <a href="{% url 'terms' %}">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/script_v3.js' %}"></script>
+</body>
+
+</html>

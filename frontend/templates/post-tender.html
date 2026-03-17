@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post New Tender - TENDERLINK</title>
+    <link rel="stylesheet" href="{% static 'css/style_v3.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="auth-page-container">
+        <div class="auth-card" style="max-width: 800px;">
+            <div class="auth-header" style="text-align: left; display: flex; align-items: center; gap: 16px;">
+                <div
+                    style="width: 50px; height: 50px; background: #e0e7ff; color: var(--primary-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <div>
+                    <h2 style="margin: 0; font-size: 1.5rem;">Post New Tender</h2>
+                    <p style="margin: 0;">Publish a new procurement opportunity</p>
+                </div>
+            </div>
+
+            <form class="auth-form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Tender Title</label>
+                    <input type="text" name="title" class="auth-input"
+                        placeholder="e.g. Construction of Community Center" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category" class="auth-input">
+                            <option value="construction">Construction & Works</option>
+                            <option value="electrical">Electrical</option>
+                            <option value="medical">Medical Supply</option>
+                            <option value="consultancy">Consultancy</option>
+                            <option value="transport">Transport</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Value (₹)</label>
+                        <input type="number" name="budget" class="auth-input" placeholder="500000" step="0.01" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="location" class="auth-input" placeholder="City, District" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline</label>
+                        <input type="date" name="deadline" class="auth-input" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description & Requirements</label>
+                    <textarea name="description" class="auth-input" style="height: 120px; resize: vertical;"
+                        placeholder="Detailed scope of work..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Tender Document</label>
+                    <input type="file" name="document" class="auth-input">
+                </div>
+
+                <div style="display: flex; gap: 16px; margin-top: 30px;">
+                    <button type="button" class="btn" style="flex: 1; border: 1px solid #e2e8f0; background: white;"
+                        onclick="window.history.back()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">Publish Tender</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="{% static 'js/script_v3.js' %}"></script>
+</body>
+
+</html>
