@@ -128,6 +128,7 @@ STATICFILES_DIRS = [BASE_DIR.parent / 'frontend' / 'static']
 
 # Required for production static files gathering
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Media files (Uploads)
 MEDIA_URL = '/media/'
