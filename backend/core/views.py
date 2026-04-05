@@ -152,6 +152,9 @@ def partner_applications(request):
 
 @login_required
 def post_tender(request):
+    if request.user.role.lower() not in ['partner_admin', 'partner']:
+        messages.error(request, "Only partners can post tenders.")
+        return redirect('index')
     if request.method == 'POST':
         form = TenderForm(request.POST, request.FILES)
         if form.is_valid():
@@ -282,7 +285,7 @@ def accept_bid(request, bid_id):
 def delete_tender(request, pk):
     tender = get_object_or_404(Tender, pk=pk, posted_by=request.user)
 
-    if request.user.role != 'partner':
+    if request.user.role.lower() not in ['partner_admin', 'partner']:
         messages.error(request, "You are not authorized to perform this action.")
         return redirect('index')
 

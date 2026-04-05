@@ -29,6 +29,10 @@ class RegistrationForm(forms.ModelForm):
         email = cleaned_data.get("email")
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already registered")
+            
+        role = cleaned_data.get("role")
+        if role == 'super_admin':
+            raise forms.ValidationError("Cannot register as super_admin")
              
         return cleaned_data
 
